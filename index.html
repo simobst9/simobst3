@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>simobst_rewards - Complete Tasks & Claim Rewards</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --bg-color: #0d0f17;
+      --card-bg: #161926;
+      --accent: #00ff88;
+      --accent-blue: #00b4d8;
+      --text: #ffffff;
+      --text-muted: #8e95a5;
+      --border: #232738;
+      --danger: #ff4757;
+      --glow: rgba(0, 255, 136, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 70px;
+    }
+
+    header {
+      width: 100%;
+      max-width: 600px;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      background: rgba(22, 25, 38, 0.8);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      font-size: 19px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+    }
+
+    .points-badge {
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid var(--accent);
+      padding: 6px 14px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--accent);
+    }
+
+    main {
+      width: 100%;
+      max-width: 600px;
+      padding: 20px 15px;
+    }
+
+    .progress-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 14px;
+      background: #0d0f17;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00b4d8, var(--accent));
+      width: 10%;
+      border-radius: 20px;
+      transition: width 0.5s ease-in-out;
+      box-shadow: 0 0 10px var(--glow);
+    }
+
+    .progress-footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .nav-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+      box-shadow: 0 0 15px var(--glow);
+    }
+
+    .tab-pane {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: border-color 0.2s;
+    }
+
+    .card-item:hover {
+      border-color: var(--accent-blue);
+    }
+
+    .item-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .item-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      background: #232738;
+      color: var(--accent);
+      overflow: hidden;
+    }
+
+    .item-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .item-info h3 {
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    .item-info p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .btn-action {
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.2s;
+      white-space: nowrap;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-action:active {
+      transform: scale(0.95);
+    }
+
+    .withdraw-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+    }
+
+    .available-methods {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 15px 0 20px 0;
+    }
+
+    .method-tag {
+      background: #0d0f17;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 6px;
+      text-align: center;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      color: #cbd5e1;
+    }
+
+    .method-tag i {
+      font-size: 18px;
+      color: var(--accent);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .form-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .withdraw-input {
+      width: 100%;
+      padding: 12px 14px;
+      background: #0d0f17;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .withdraw-input:focus {
+      border-color: var(--accent);
+    }
+
+    .summary-box {
+      background: rgba(0, 255, 136, 0.05);
+      border: 1px dashed var(--accent);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .leader-row {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .rank { font-weight: 800; font-size: 14px; width: 24px; }
+    .rank-1 { color: #ffd700; }
+
+    .live-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      margin-right: 5px;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <i class="fa-solid fa-gamepad"></i> simobst_rewards
+    </div>
+    <div class="points-badge">
+      <i class="fa-solid fa-coins"></i>
+      <span id="user-points">10</span> PTS
+    </div>
+  </header>
+
+  <main>
+    <div class="progress-card">
+      <div class="progress-header">
+        <span id="progress-goal-title"><i class="fa-solid fa-gift" style="color: var(--accent);"></i> Target: $1.00 Payout</span>
+        <span id="progress-text" style="color: var(--accent);">10 / 100 PTS</span>
+      </div>
+      <div class="progress-track">
+        <div id="progress-fill" class="progress-bar-fill"></div>
+      </div>
+      <div class="progress-footer">
+        <span id="progress-tier-label">Next Goal: $1.00 (100 PTS)</span>
+        <span>100 PTS = $1.00 USD</span>
+      </div>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('offers')">
+        <i class="fa-solid fa-list-check"></i>
+        <span>Offers</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('withdraw')">
+        <i class="fa-solid fa-wallet"></i>
+        <span>Withdraw</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('leaderboard')">
+        <i class="fa-solid fa-trophy"></i>
+        <span>Winners</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: REAL OFFERS -->
+    <div id="offers-tab" class="tab-pane active">
+      <div class="grid" id="offers-list">
+        <div style="text-align:center; padding:30px; color:var(--text-muted);">
+          <i class="fa-solid fa-spinner fa-spin" style="font-size:24px; color:var(--accent); margin-bottom:10px;"></i>
+          <p>Fetching active offers...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: WITHDRAW -->
+    <div id="withdraw-tab" class="tab-pane">
+      <div class="withdraw-container">
+        <h2 style="font-size: 17px; margin-bottom: 4px;">Redeem All Your Points</h2>
+        <p style="color: var(--text-muted); font-size: 12px;">Supported global payment & gaming methods:</p>
+
+        <div class="available-methods">
+          <div class="method-tag"><i class="fa-brands fa-paypal"></i> PayPal</div>
+          <div class="method-tag"><i class="fa-brands fa-cc-visa"></i> Visa Card</div>
+          <div class="method-tag"><i class="fa-brands fa-amazon"></i> Amazon</div>
+          <div class="method-tag"><i class="fa-solid fa-fire"></i> Free Fire</div>
+          <div class="method-tag"><i class="fa-solid fa-bolt"></i> PUBG UC</div>
+          <div class="method-tag"><i class="fa-solid fa-cube"></i> Roblox</div>
+          <div class="method-tag"><i class="fa-solid fa-futbol"></i> eFootball</div>
+          <div class="method-tag"><i class="fa-brands fa-playstation"></i> PSN Card</div>
+          <div class="method-tag"><i class="fa-brands fa-apple"></i> Apple Code</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Select Withdrawal Method:</label>
+          <select id="payout-method" class="withdraw-input" onchange="handleMethodChange()">
+            <option value="PayPal">PayPal Cash (USD)</option>
+            <option value="Visa">Visa Virtual Prepaid Card</option>
+            <option value="Amazon">Amazon Gift Card</option>
+            <option value="Free Fire">Free Fire (Direct Diamonds Top-Up)</option>
+            <option value="PUBG Mobile">PUBG Mobile (Direct UC Top-Up)</option>
+            <option value="Roblox">Roblox (Robux)</option>
+            <option value="eFootball">eFootball / PES (Coins)</option>
+            <option value="PlayStation">PlayStation PSN Code</option>
+            <option value="Apple">Apple App Store Voucher</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label id="input-label" class="form-label">PayPal Email Address:</label>
+          <input type="text" id="target-account-id" class="withdraw-input" placeholder="example@email.com">
+        </div>
+
+        <div class="summary-box">
+          <span>Points to Redeem: <strong id="summary-points" style="color:var(--accent);">10 PTS</strong></span>
+          <span>Cash Value: <strong id="summary-value" style="color:var(--accent);">$0.10 USD</strong></span>
+        </div>
+
+        <button class="btn-action" style="width: 100%; padding: 14px; font-size: 15px;" onclick="processWithdrawal()">
+          Confirm & Cash Out All Points ⚡
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 3: LEADERBOARD -->
+    <div id="leaderboard-tab" class="tab-pane">
+      <div id="leaderboard-list">
+        <div class="leader-row">
+          <div style="display:flex; align-items:center; gap: 10px;">
+            <span class="rank rank-1">#1</span>
+            <div>
+              <strong>Hamza_Pro</strong>
+              <div style="font-size: 11px; color: var(--text-muted);"><span class="live-indicator"></span>Withdrew $10.00 via PayPal</div>
+            </div>
+          </div>
+          <span style="color: var(--accent); font-weight:700;">1,000 PTS</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let userPoints = parseInt(localStorage.getItem('user_pts')) || 10;
+    localStorage.setItem('user_pts', userPoints);
+
+    const tiers = [
+      { points: 100, label: "$1.00" },
+      { points: 500, label: "$5.00" },
+      { points: 1000, label: "$10.00" },
+      { points: 2000, label: "$20.00" }
+    ];
+
+    function getCurrentTier() {
+      for (let i = 0; i < tiers.length; i++) {
+        if (userPoints < tiers[i].points) {
+          return tiers[i];
+        }
+      }
+      return tiers[tiers.length - 1];
+    }
+
+    function updateUI() {
+      document.getElementById('user-points').innerText = userPoints;
+      
+      const currentTier = getCurrentTier();
+      const targetPts = currentTier.points;
+      
+      let progressPercent = Math.min((userPoints / targetPts) * 100, 100);
+      document.getElementById('progress-fill').style.width = progressPercent + '%';
+      document.getElementById('progress-text').innerText = `${userPoints} / ${targetPts} PTS`;
+      
+      document.getElementById('progress-goal-title').innerHTML = `<i class="fa-solid fa-gift" style="color: var(--accent);"></i> Target: ${currentTier.label} Payout`;
+      document.getElementById('progress-tier-label').innerText = `Next Goal: ${currentTier.label} (${targetPts} PTS)`;
+
+      document.getElementById('summary-points').innerText = `${userPoints} PTS`;
+      document.getElementById('summary-value').innerText = `$${(userPoints / 100).toFixed(2)} USD`;
+    }
+    updateUI();
+
+    function handleMethodChange() {
+      const method = document.getElementById('payout-method').value;
+      const label = document.getElementById('input-label');
+      const input = document.getElementById('target-account-id');
+
+      if (method === "Free Fire") {
+        label.innerText = "Free Fire Player ID (UID):";
+        input.placeholder = "e.g., 1892837492";
+      } else if (method === "PUBG Mobile") {
+        label.innerText = "PUBG Mobile Character ID:";
+        input.placeholder = "e.g., 5123498765";
+      } else if (method === "Roblox") {
+        label.innerText = "Roblox Account Username:";
+        input.placeholder = "e.g., RobloxPlayer99";
+      } else if (method === "eFootball") {
+        label.innerText = "Konami ID / In-Game Username:";
+        input.placeholder = "e.g., konami_user@mail.com";
+      } else {
+        label.innerText = `${method} Email Address:`;
+        input.placeholder = "name@example.com";
+      }
+    }
+
+    function renderOffers(offers) {
+      const container = document.getElementById('offers-list');
+
+      if (Array.isArray(offers) && offers.length > 0) {
+        container.innerHTML = '';
+        offers.forEach(offer => {
+          const payoutUSD = parseFloat(offer.payout || 0.40);
+          const points = Math.round(payoutUSD * 100);
+          const offerTitle = offer.name_short || offer.name || 'Complete Sponsored Task';
+          const offerDesc = offer.adcopy || offer.description_short || 'Complete this task on your device to earn points';
+          const offerLink = offer.link || offer.url || '#';
+          const iconImg = offer.picture ? `<img src="${offer.picture}" alt="icon">` : `<i class="fa-solid fa-mobile-screen-button"></i>`;
+
+          const item = document.createElement('div');
+          item.className = 'card-item';
+          item.innerHTML = `
+            <div class="item-left">
+              <div class="item-icon">${iconImg}</div>
+              <div class="item-info">
+                <h3>${offerTitle}</h3>
+                <p>${offerDesc}</p>
+              </div>
+            </div>
+            <a href="${offerLink}" target="_blank" class="btn-action">
+              +${points} PTS ($${payoutUSD.toFixed(2)})
+            </a>
+          `;
+          container.appendChild(item);
+        });
+      } else {
+        container.innerHTML = `
+          <div style="text-align:center; padding:25px; color:var(--text-muted); font-size:13px;">
+            No tasks currently available for your location. Please check back later.
+          </div>
+        `;
+      }
+    }
+
+    async function loadDirectOffers() {
+      const container = document.getElementById('offers-list');
+      const API_TOKEN = "47665|czezsNnwLYfSxF6GfZRLjzlbhsCbCk1Plydj874P0d4160c5";
+      
+      try {
+        const response = await fetch('https://saveapp.space/api/v2/offers?ctype=1&ip=104.28.214.73', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${API_TOKEN}`,
+            'Accept': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Server returned status ${response.status}`);
+        }
+
+        const resData = await response.json();
+        const offers = resData.data || resData.offers || (Array.isArray(resData) ? resData : []);
+        renderOffers(offers);
+
+      } catch (error) {
+        console.error("API Fetch Error:", error);
+        container.innerHTML = `
+          <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px;">
+            Connection failed. Ensure you are running via a web server (Netlify or Live Server).
+          </div>
+        `;
+      }
+    }
+
+    loadDirectOffers();
+
+    function processWithdrawal() {
+      const method = document.getElementById('payout-method').value;
+      const accountInput = document.getElementById('target-account-id').value.trim();
+
+      if (!accountInput) {
+        alert("Please fill in your ID or Email before continuing.");
+        return;
+      }
+
+      if (userPoints < 100) {
+        alert(`Minimum withdrawal threshold is 100 PTS ($1.00). You currently have ${userPoints} PTS.`);
+        switchTab('offers');
+        return;
+      }
+
+      alert(`Withdrawal request submitted for ${userPoints} PTS via ${method}!\nAccount: ${accountInput}`);
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+      document.getElementById(`${tabName}-tab`).classList.add('active');
+      
+      const buttons = document.querySelectorAll('.tab-btn');
+      if (tabName === 'offers') buttons[0].classList.add('active');
+      if (tabName === 'withdraw') buttons[1].classList.add('active');
+      if (tabName === 'leaderboard') buttons[2].classList.add('active');
+    }
+  </script>
+</body>
+</html>
